@@ -75,6 +75,10 @@ final readonly class NotifyController
         ));
 
         /** @var string $serviceKey */
+        Assert::keyExists($gatewayConfig->getConfig(), 'service_key', sprintf(
+            'The GatewayConfig has not been configured correctly. The service_key is missing for gateway: %s.',
+            $gatewayConfig->getId()
+        ));
         $serviceKey = $gatewayConfig->getConfig()['service_key'];
 
         if (false === $this->signatureResolver->verifySignature($request, $serviceKey)) {
