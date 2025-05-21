@@ -7,5 +7,6 @@ services:
         arguments:
             - '@sylius.repository.order'
             - '@sylius.repository.payment'
+            - '@sylius.repository.payment_method'
             - '@doctrine.orm.entity_manager'
             - '@bitbag.imoje_plugin.resolver.signature_resolver'

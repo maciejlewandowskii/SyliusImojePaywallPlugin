@@ -14,7 +14,9 @@ namespace BitBag\SyliusImojePlugin\Controller;
 use BitBag\SyliusImojePlugin\Resolver\SignatureResolverInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Component\Core\Model\PaymentInterface;
+use Sylius\Component\Core\Model\PaymentMethod;
 use Sylius\Component\Core\Repository\OrderRepositoryInterface;
+use Sylius\Component\Core\Repository\PaymentMethodRepositoryInterface;
 use Sylius\Component\Core\Repository\PaymentRepositoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +28,7 @@ final readonly class NotifyController
     public function __construct(
         private OrderRepositoryInterface $orderRepository,
         private PaymentRepositoryInterface $paymentRepository,
+        private PaymentMethodRepositoryInterface $paymentMethodRepository,
         private EntityManagerInterface $entityManager,
         private SignatureResolverInterface $signatureResolver,
     ) {
@@ -54,9 +57,15 @@ final readonly class NotifyController
             $orderNumber,
         ));
 
+        /** @var PaymentMethod|null $paymentMethod */
+        $paymentMethod = $this->paymentMethodRepository->findOneBy(['code' => 'IMOJE']);
+        Assert::notNull($paymentMethod, sprintf(
+            'Payment method "IMOJE" has not been configured. Please configure it in the admin panel.',
+        ));
+
         $orderId = (string) $order->getId();
         /** @var PaymentInterface|null $payment */
-        $payment = $this->paymentRepository->findOneBy(['order' => $orderId]);
+        $payment = $this->paymentRepository->findOneBy(['order' => $orderId, 'method' => $paymentMethod]);
         Assert::notNull($payment, sprintf(
             'There is no payment registered for order: %s.',
             $orderId,
