@@ -99,8 +99,6 @@ final readonly class NotifyController
         $this->entityManager->persist($payment);
         $this->entityManager->flush();
 
-        return new JsonResponse([
-            'status' => $imojePaymentStatus,
-        ]);
+        return new Response('OK', Response::HTTP_OK);
     }
 }
